@@ -37,30 +37,29 @@ class FirstFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (Environment.isExternalStorageManager()) {
+                    println("get file permission in android 11 or above")
+                }
+            }.launch(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
+        } else {
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+                if (it) {
+                    println("get WRITE_EXTERNAL_STORAGE permission")
+                }
+            }.launch(WRITE_EXTERNAL_STORAGE)
+        }
         //use SAF in external SDCard
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val data = Uri.parse("content://com.android.externalstorage.documents/document/primary%3AAndroid%2Fdata")
             val obb = Uri.parse("content://com.android.externalstorage.documents/document/primary%3AAndroid%2Fobb")
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
                 .launch(Intent(ACTION_OPEN_DOCUMENT_TREE).apply {
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
-                    putExtra(DocumentsContract.EXTRA_INITIAL_URI, obb)
-            })
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+                        putExtra(DocumentsContract.EXTRA_INITIAL_URI, obb)
+                })
         }
-        Permission
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-//                if (Environment.isExternalStorageManager()) {
-//                    println("get file permission in android 11 or above")
-//                }
-//            }.launch(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
-//        } else {
-//            registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-//                if (it) {
-//                    println("get WRITE_EXTERNAL_STORAGE permission")
-//                }
-//            }.launch(WRITE_EXTERNAL_STORAGE)
-//        }
     }
 
     override fun onDestroyView() {
